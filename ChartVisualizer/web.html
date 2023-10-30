@@ -1,0 +1,95 @@
+﻿<html>
+
+<head>
+    <script src='https://code.jquery.com/jquery-3.5.1.min.js'></script>
+    <script src='https://code.highcharts.com/stock/highstock.js'></script>
+</head>
+
+<body>
+    <div id='container'></div>
+    <script type="text/javascript">
+        function displayMessage(message) {
+            ohlc = message['Prices'];
+            volume = message['Volumes'];
+            emaData = message['EMA20'];
+            stockName = message['StockName'];
+            pivot = message['Pivot'];
+            // Create the Highstock chart
+            Highcharts.stockChart('container', {
+                rangeSelector: {
+                    selected: 1
+                },
+                title: {
+                    text: stockName
+                },
+                series: [{
+                    type: 'candlestick',
+                    name: 'OHLC',
+                    data: ohlc,
+                    tooltip: {
+                        valueDecimals: 2
+                    }
+                }],
+                yAxis: [{
+                    labels: {
+                        align: 'right',
+                        x: -3
+                    },
+                    title: {
+                        text: 'OHLC'
+                    },
+                    height: '60%',
+                    lineWidth: 2
+                }, {
+                    labels: {
+                        align: 'right',
+                        x: -3
+                    },
+                    title: {
+                        text: 'Volume'
+                    },
+                    top: '65%',
+                    height: '35%',
+                    offset: 0,
+                    lineWidth: 2
+                }],
+                tooltip: {
+                    split: true
+                },
+                chart: {
+                    height: '75%'
+                },
+                plotOptions: {
+                    candlestick: {
+                        color: '#ff0000',
+                        upColor: '#00ff00'
+                    }
+                },
+                series: [{
+                    type: 'candlestick',
+                    name: stockName,
+                    data: ohlc
+                }, {
+                    type: 'column',
+                    name: 'Volume',
+                    data: volume,
+                    yAxis: 1
+                }, {
+                    type: 'line',
+                    name: 'EMA',
+                    linkedTo: 'candlestick',
+
+                    data: emaData
+                }, {
+                    type: 'line',
+                    name: 'PIVOT',
+                    linkedTo: 'candlestick',
+
+                    data: pivot
+                }]
+            });
+        }
+    </script>
+</body>
+
+</html>

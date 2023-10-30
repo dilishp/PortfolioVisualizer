@@ -1,0 +1,57 @@
+﻿@page "/fetchdata"
+
+@using PortfolioVisualizer.Data
+@inject StockTickListenerService StockTickListener
+
+<h1>Portfolio</h1>
+
+<p>Know Your Portfolio</p>
+
+@if (stockData.Count == 0)
+{
+	<p><em>Loading...</em></p>
+}
+else
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Stock</th>
+				<th>LTP</th>
+			</tr>
+		</thead>
+		<tbody>
+			@functions{
+			void OnStockTickReceived(StockData data)
+			{
+				if(stockData.ContainsKey(data.TickerName))
+				{
+					stockData[data.TickerName] = data.TickerPrice;
+				}
+				else
+				{
+					stockData.Add(data.TickerName, data.TickerPrice);
+				}
+			}
+			}
+
+			@foreach (var tick in stockData)
+			{
+			<tr>
+				<td>@tick.Key</td>
+				<td>@tick.Value</td>
+			</tr>
+			}
+		</tbody>
+	</table>
+}
+
+@code {
+	private IDictionary<string,uint> stockData = new Dictionary<string,uint>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		StockTickListener.StockTickReceived += OnStockTickReceived;
+		await StockTickListener.Listen();
+	}
+}
