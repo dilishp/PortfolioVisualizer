@@ -13,6 +13,7 @@
 }
 else
 {
+
 	<table class="table">
 		<thead>
 			<tr>
@@ -26,12 +27,20 @@ else
 			{
 				if(stockData.ContainsKey(data.TickerName))
 				{
-					stockData[data.TickerName] = data.TickerPrice;
+					if (data.LTP > stockData[data.TickerName].Key)
+					{
+						stockData[data.TickerName] = new KeyValuePair<uint,Color>(data.LTP,Colors.Green);
+					}
+					else if (data.LTP < stockData[data.TickerName].Key)
+					{
+						stockData[data.TickerName] = new KeyValuePair<uint, Color>(data.LTP, Colors.Red);
+					}
 				}
 				else
 				{
-					stockData.Add(data.TickerName, data.TickerPrice);
+					stockData.Add(data.TickerName, new KeyValuePair<uint, Color>(data.LTP, Colors.White));
 				}
+				StateHasChanged();
 			}
 			}
 
@@ -39,7 +48,7 @@ else
 			{
 			<tr>
 				<td>@tick.Key</td>
-				<td>@tick.Value</td>
+				<td style="@Getstyle(tick.Value.Value)">@tick.Value.Key</td>
 			</tr>
 			}
 		</tbody>
@@ -47,11 +56,22 @@ else
 }
 
 @code {
-	private IDictionary<string,uint> stockData = new Dictionary<string,uint>();
+	private IDictionary<string, KeyValuePair<uint, Color>> stockData = new Dictionary<string, KeyValuePair<uint, Color>>();
+
+
+	string Getstyle(Color color)
+	{
+		if (color == Colors.Red)
+			return "background-color:red;";
+		else if (color == Colors.Green)
+			return "background-color:green;";
+		return "background-color:white;";
+	}
 
 	protected override async Task OnInitializedAsync()
 	{
 		StockTickListener.StockTickReceived += OnStockTickReceived;
 		await StockTickListener.Listen();
 	}
+
 }

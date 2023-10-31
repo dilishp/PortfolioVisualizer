@@ -27,12 +27,17 @@ app.Map("/ws", async context =>
             {
                 long r = rand.NextInt64(-10, 10);
                 long stockIndex = (r % stockList.Count());
-                tickPrice[stockIndex] = tickPrice[stockIndex] + r;
-                byte[] data = Encoding.ASCII.GetBytes($"{stockList[stockIndex]} : {tickPrice[stockIndex]}");
-                await webSocket.SendAsync(data, WebSocketMessageType.Text,
-                    true, CancellationToken.None);
+                
+                
+                if (stockIndex >= 0 && stockIndex < stockList.Count())
+                {
+                    tickPrice[stockIndex] = tickPrice[stockIndex] + r;
+                    byte[] data = Encoding.ASCII.GetBytes($"{stockList[stockIndex]}:{tickPrice[stockIndex]}");
+                    await webSocket.SendAsync(data, WebSocketMessageType.Text,
+                        true, CancellationToken.None);
+                    await Task.Delay(1000);
+                }
 
-                await Task.Delay(1000);
                 //if (r == 7)
                 //{
                 //    await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure,
@@ -49,15 +54,15 @@ app.Map("/ws", async context =>
     }
     catch(ArgumentNullException ex) when (ex.InnerException != null)
     {
-
-    }
+		string message = ex.Message;
+	}
     catch  (HttpRequestException hexp) when(hexp.StatusCode == HttpStatusCode.Accepted)
     {
-
-    }
-    catch(Exception e) 
+		string message = hexp.Message;
+	}
+	catch (Exception e) 
     {
-
+        string message = e.Message;
     }
 });
 
