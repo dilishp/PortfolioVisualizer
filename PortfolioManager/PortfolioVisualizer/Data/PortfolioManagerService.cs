@@ -83,6 +83,8 @@ namespace PortfolioVisualizer.Data
 	{
 		private HashSet<Holding> myHoldings = new HashSet<Holding>(new HoldingComparer());
 
+		public HashSet<Holding> Holdings { get => myHoldings; set => myHoldings = value; }
+
 		public void Buy(Order order)
 		{
 			var holding = new Holding()

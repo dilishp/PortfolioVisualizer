@@ -21,6 +21,7 @@ namespace PortfolioVisualizer
 #endif
 
             builder.Services.AddSingleton<StockTickListenerService>();
+            builder.Services.AddSingleton<PortfolioManagerService>();
 
             return builder.Build();
         }

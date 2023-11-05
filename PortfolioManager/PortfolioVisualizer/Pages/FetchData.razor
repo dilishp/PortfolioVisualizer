@@ -2,6 +2,7 @@
 
 @using PortfolioVisualizer.Data
 @inject StockTickListenerService StockTickListener
+@inject PortfolioManagerService PortfolioManager
 
 <h1>WatchList</h1>
 
@@ -78,7 +79,21 @@ else
 	private void OnClicked(OrderType orderType, 
 		KeyValuePair<string,KeyValuePair<uint,Color>> data)
 	{
-		
+		var order = new Order()
+		{
+			Ticker = data.Key,
+			Price = data.Value.Key,
+			Quantity = 1
+		};
+
+		if (orderType.Equals(OrderType.Buy))
+		{
+			PortfolioManager.Buy(order);
+		}
+		else
+		{
+			PortfolioManager.Sell(order);
+		}
 	}
 
 	protected override async Task OnInitializedAsync()
