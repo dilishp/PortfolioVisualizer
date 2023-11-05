@@ -8,6 +8,12 @@ using System.Diagnostics;
 
 namespace PortfolioVisualizer.Data
 {
+    public enum OrderType
+    {
+        Buy,
+        Sell
+    }
+
     public class StockData
     {
         public string TickerName { get; set; }

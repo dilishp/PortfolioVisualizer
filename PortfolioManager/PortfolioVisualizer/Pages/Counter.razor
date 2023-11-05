@@ -1,6 +1,11 @@
-﻿@page "/counter"
+﻿@page "/portfolio"
 
-<h1>Counter</h1>
+@using PortfolioVisualizer.Data
+
+@inject PortfolioManagerService PortfolioManager;
+@inject StockTickListenerService StockTickListener;
+
+<h1>Portfolio</h1>
 
 <p role="status">Current count: @currentCount</p>
 
@@ -12,5 +17,16 @@
     private void IncrementCount()
     {
         currentCount++;
+    }
+
+    private void OnStockTickReceived(StockData data)
+    {
+        PortfolioManager.OnStockTickReceived(data);
+    }
+
+    protected async override void OnInitialized()
+    {
+        StockTickListener.StockTickReceived += OnStockTickReceived;
+        await StockTickListener.Listen();
     }
 }

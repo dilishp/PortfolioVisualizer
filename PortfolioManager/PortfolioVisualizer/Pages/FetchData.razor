@@ -3,9 +3,9 @@
 @using PortfolioVisualizer.Data
 @inject StockTickListenerService StockTickListener
 
-<h1>Portfolio</h1>
+<h1>WatchList</h1>
 
-<p>Know Your Portfolio</p>
+<p>Your Stocks</p>
 
 @if (stockData.Count == 0)
 {
@@ -48,7 +48,13 @@ else
 			{
 			<tr>
 				<td>@tick.Key</td>
-				<td style="@Getstyle(tick.Value.Value)">@tick.Value.Key</td>
+				<td style="@Getstyle(tick.Value.Value)">
+					@tick.Value.Key
+				</td>
+				<td>
+					<button @onclick="()=>OnClicked(OrderType.Buy,tick)" style="color:blue; margin:auto">B</button>
+					<button @onclick="()=>OnClicked(OrderType.Sell,tick)" style="color:red;margin:auto">S</button>
+				</td>
 			</tr>
 			}
 		</tbody>
@@ -59,13 +65,20 @@ else
 	private IDictionary<string, KeyValuePair<uint, Color>> stockData = new Dictionary<string, KeyValuePair<uint, Color>>();
 
 
+
 	string Getstyle(Color color)
 	{
 		if (color == Colors.Red)
-			return "background-color:red;";
+			return "color:white;background-color:red;";
 		else if (color == Colors.Green)
-			return "background-color:green;";
-		return "background-color:white;";
+			return "color:white;background-color:green;";
+		return "color:black;background-color:white;";
+	}
+
+	private void OnClicked(OrderType orderType, 
+		KeyValuePair<string,KeyValuePair<uint,Color>> data)
+	{
+		
 	}
 
 	protected override async Task OnInitializedAsync()
