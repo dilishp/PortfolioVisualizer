@@ -38,14 +38,12 @@ namespace PortfolioVisualizer.Data
 		public Holding()
 		{
 			Allotments = new List<Allotment>();
-			Quantity= 0;
 			AveragePrice= 0;
 			Gain = 0;
 			TotalValue = 0;
 		}
 
 		public string Ticker { get; set; }
-		public uint Quantity { get; set; }
 		public uint AveragePrice { get; private set; }
 		public IList<Allotment> Allotments { get; set; }
 		public  uint TotalValue { get; set; }
@@ -90,20 +88,22 @@ namespace PortfolioVisualizer.Data
 			var holding = new Holding()
 			{
 				Ticker= order.Ticker,
-				Quantity= order.Quantity,
 			};
 
-			if(myHoldings.TryGetValue(holding, out var existingholding))
+			var allotment = new Allotment()
 			{
-				existingholding.Allotments.Add(new Allotment()
-				{
-					AllotPrice = order.Price,
-					Quantity = (int)order.Quantity,
-				});
+				AllotPrice = order.Price,
+				Quantity = (int)order.Quantity,
+			};
+
+			if (myHoldings.TryGetValue(holding, out var existingholding))
+			{
+				existingholding.Allotments.Add(allotment);
 				existingholding.CalculateAverage();
 			}
 			else
 			{
+				holding.Allotments.Add(allotment);
 				myHoldings.Add(holding);
 			}
 		}
@@ -113,7 +113,6 @@ namespace PortfolioVisualizer.Data
 			var holding = new Holding()
 			{
 				Ticker = order.Ticker,
-				Quantity = order.Quantity,
 			};
 
 			if (myHoldings.TryGetValue(holding, out var existingholding))
