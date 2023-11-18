@@ -83,6 +83,8 @@ namespace PortfolioVisualizer.Data
 
 		public HashSet<Holding> Holdings { get => myHoldings; set => myHoldings = value; }
 
+		public int PL { get; set; }
+
 		public void Buy(Order order)
 		{
 			var holding = new Holding()
@@ -104,6 +106,7 @@ namespace PortfolioVisualizer.Data
 			else
 			{
 				holding.Allotments.Add(allotment);
+				holding.CalculateAverage();
 				myHoldings.Add(holding);
 			}
 		}
@@ -140,6 +143,12 @@ namespace PortfolioVisualizer.Data
 			{
 				existingholding.LTP = stockData.LTP;
 				existingholding.CalculateGain();
+			}
+
+			PL = 0;
+			foreach (var ticker in myHoldings)
+			{
+				PL += ticker.Gain;
 			}
 		}
 	}

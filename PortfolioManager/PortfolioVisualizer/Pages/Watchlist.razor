@@ -1,0 +1,105 @@
+﻿@page "/watchlist"
+
+@using PortfolioVisualizer.Data
+@inject StockTickListenerService StockTickListener
+@inject PortfolioManagerService PortfolioManager
+
+<h1>WatchList</h1>
+
+<p>Your Stocks</p>
+
+@if (stockData.Count == 0)
+{
+	<p><em>Loading...</em></p>
+}
+else
+{
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Stock</th>
+				<th>LTP</th>
+			</tr>
+		</thead>
+		<tbody>
+			@functions{
+			void OnStockTickReceived(StockData data)
+			{
+				if(stockData.ContainsKey(data.TickerName))
+				{
+					if (data.LTP > stockData[data.TickerName].Key)
+					{
+						stockData[data.TickerName] = new KeyValuePair<uint,Color>(data.LTP,Colors.Green);
+					}
+					else if (data.LTP < stockData[data.TickerName].Key)
+					{
+						stockData[data.TickerName] = new KeyValuePair<uint, Color>(data.LTP, Colors.Red);
+					}
+				}
+				else
+				{
+					stockData.Add(data.TickerName, new KeyValuePair<uint, Color>(data.LTP, Colors.White));
+				}
+				StateHasChanged();
+			}
+			}
+
+			@foreach (var tick in stockData)
+			{
+			<tr>
+				<td>@tick.Key</td>
+				<td style="@Getstyle(tick.Value.Value)">
+					@tick.Value.Key
+				</td>
+				<td>
+					<button @onclick="()=>OnClicked(OrderType.Buy,tick)" style="color:blue; margin:auto">B</button>
+					<button @onclick="()=>OnClicked(OrderType.Sell,tick)" style="color:red;margin:auto">S</button>
+				</td>
+			</tr>
+			}
+		</tbody>
+	</table>
+}
+
+@code {
+	private IDictionary<string, KeyValuePair<uint, Color>> stockData = new Dictionary<string, KeyValuePair<uint, Color>>();
+
+
+
+	string Getstyle(Color color)
+	{
+		if (color == Colors.Red)
+			return "color:white;background-color:red;";
+		else if (color == Colors.Green)
+			return "color:white;background-color:green;";
+		return "color:black;background-color:white;";
+	}
+
+	private void OnClicked(OrderType orderType, 
+		KeyValuePair<string,KeyValuePair<uint,Color>> data)
+	{
+		var order = new Order()
+		{
+			Ticker = data.Key,
+			Price = data.Value.Key,
+			Quantity = 1
+		};
+
+		if (orderType.Equals(OrderType.Buy))
+		{
+			PortfolioManager.Buy(order);
+		}
+		else
+		{
+			PortfolioManager.Sell(order);
+		}
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		StockTickListener.StockTickReceived += OnStockTickReceived;
+		await StockTickListener.Listen();
+	}
+
+}
